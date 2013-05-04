@@ -47,7 +47,5 @@ mkSimpleGrid cfg@(SimpleGridConfig{..})= sg
         ko_unwrapObservableArray gridData >>= sliceV startIndex (startIndex + pageSize)
     , maxPageIndex = ko_computed $ do
         len <- ko_unwrapObservableArray gridData >>= lengthV
-        return len
-        -- let res = 1 + div len pageSize
-        -- return res
+        return $ ceiling (fromIntegral len / (fromIntegral pageSize :: Double)) - 1
     }
