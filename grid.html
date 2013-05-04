@@ -6,19 +6,15 @@
     <script defer="defer" src="Main.js"></script>
   </head>
   <body>
-    <!-- <div data-bind='simpleGrid: gridViewModel'> </div>
-    -->
-    <ul data-bind='foreach: items'>
-      <li data-bind='text: $data.price'></li>
-    </ul>
     <button data-bind='click: addItem'>
         Add item
     </button>
     <button data-bind='click: sortByName'>
         Sort by name
     </button>
-    <button data-bind='click: jumpToFP'>
+    <button data-bind='click: jumpToFP, enable: gridVM.currentPageIndex'>
         Jump to first page
     </button>
+    <div data-bind='simpleGrid: gridVM'> </div>
   </body>
 </html>

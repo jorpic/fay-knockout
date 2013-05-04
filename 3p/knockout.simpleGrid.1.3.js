@@ -14,7 +14,7 @@
     ko.simpleGrid = {
         // Defines a view model class you can use to populate a grid
         viewModel: function (configuration) {
-            this.data = configuration.data;
+            this.data = configuration.gridData;
             this.currentPageIndex = ko.observable(0);
             this.pageSize = configuration.pageSize || 5;
 
