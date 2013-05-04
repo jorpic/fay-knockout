@@ -17,4 +17,31 @@
     </button>
     <div data-bind='simpleGrid: gridVM'> </div>
   </body>
+
+  <script type='text/html' id='ko_simpleGrid_grid'>
+    <table class="ko-grid" cellspacing="0">
+      <thead>
+        <tr data-bind="foreach: gridConfig.columns">
+         <th data-bind="text: headerText"></th>
+        </tr>
+      </thead>
+      <tbody data-bind="foreach: itemsOnCurrentPage">
+        <tr data-bind="foreach: $parent.gridConfig.columns">
+          <td data-bind="text: rowText($parent)"></td>
+        </tr>
+      </tbody>
+    </table>
+  </script>
+
+  <script type='text/html' id='ko_simpleGrid_pageLinks'>
+    <div class="ko-grid-pageLinks">
+      Pages: <span data-bind="text: maxPageIndex"></span>
+      <br/> <br/>
+      <!-- ko foreach: ko.utils.range(0, maxPageIndex) -->
+        <a href="#"
+           data-bind="text: $data + 1, click: function() { $root.currentPageIndex($data) }, css: { selected: $data == $root.currentPageIndex() }">
+        </a>
+      <!-- /ko -->
+    </div>
+  </script>
 </html>

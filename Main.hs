@@ -13,14 +13,14 @@ import SimpleGrid
 
 
 
-data Entry = Entry
+data Item = Item
   { name  :: Text
   , sales :: Int
   , price :: Double
   }
 
 data TheViewModel = TheViewModel
-  { gridVM     :: SimpleGrid Entry
+  { gridVM     :: SimpleGrid Item
   , addItem    :: Fay ()
   , sortByName :: Fay ()
   , jumpToFP   :: Fay ()
@@ -32,27 +32,35 @@ instance KnockoutModel TheViewModel
 
 main :: Fay ()
 main = do
-  someItems <- observableList
-    [ Entry (pack "foo") 23 45.2
-    , Entry (pack "bar") 391 312.4
+  someItems <- ko_observableList
+    [ Item (pack "foo") 23 45.2
+    , Item (pack "bar") 391 312.4
     ]
 
   cols <- listToVector
-            [ GridColumn (pack "Item Name")   (return . txt . name)
-            , GridColumn (pack "Sales Count") (return . txt . sales)
-            , GridColumn (pack "Price")       (return . txt . price)
-            ]
-  applyBindings $ TheViewModel
-    { gridVM     = gridViewModel $ SimpleGrid
+    [ GridColumn (pack "Item Name")   (return . txt . name)
+    , GridColumn (pack "Sales Count") (return . txt . sales)
+    , GridColumn (pack "Price")       (return . append (pack "$") . txt . price)
+    ]
+
+  let grid = mkSimpleGrid $ SimpleGridConfig
         { gridData = someItems
         , columns  = cols
         , pageSize = 4
         }
-    , addItem    = pushArr someItems $ Entry (pack "new") 0 100
-    , sortByName = print (pack "not implemented")
-    , jumpToFP   = print (pack "not implemented")
-    }
+
+  let vm = TheViewModel
+        { gridVM     = grid
+        , addItem    = ko_pushObservableArray someItems $ Item (pack "new") 0 100
+        , sortByName = print (pack "not implemented")
+        , jumpToFP   = currentPageIndex grid `ko_set` 0
+        }
+  ko_applyBindings vm
 
 
+-- Text
 txt :: Automatic a -> Text
 txt = ffi "'' + %1"
+
+append :: Text -> Text -> Text
+append = ffi "%1 + %2"

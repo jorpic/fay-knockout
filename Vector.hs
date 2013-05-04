@@ -12,6 +12,13 @@ emptyV = ffi "[]"
 pushV :: Vector a -> Automatic a -> Fay (Vector a)
 pushV = ffi "%1.push(%2)"
 
+lengthV :: Vector a -> Fay Int
+lengthV = ffi "%1.length"
+
+sliceV :: Int -> Int -> Vector a -> Fay (Vector a)
+sliceV = ffi "%3.slice(%1,%2)"
+
+
 listToVector :: [a] -> Fay (Vector a)
 listToVector xs = do
   v <- emptyV

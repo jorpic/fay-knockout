@@ -1,6 +1,13 @@
 
+{-# LANGUAGE RecordWildCards #-}
 
-module SimpleGrid where
+module SimpleGrid
+  ( GridColumn (..)
+  , SimpleGridConfig (..)
+  , SimpleGrid
+  , currentPageIndex
+  , mkSimpleGrid
+  ) where
 
 import Prelude
 import FFI
@@ -15,11 +22,32 @@ data GridColumn a = GridColumn
   , rowText    :: a -> Fay Text
   }
 
-data SimpleGrid a = SimpleGrid
+data SimpleGridConfig a = SimpleGridConfig
   { gridData :: ObservableArray a
   , columns  :: Vector (GridColumn a)
   , pageSize :: Int
   }
 
-gridViewModel :: Automatic (SimpleGrid a) -> SimpleGrid a
-gridViewModel = ffi "new ko.simpleGrid.viewModel(%1)"
+data SimpleGrid a = SimpleGrid
+  { gridConfig         :: SimpleGridConfig a
+  , currentPageIndex   :: Observable Int
+  , itemsOnCurrentPage :: Observable (Vector a)
+  , maxPageIndex       :: Observable Int
+  }
+
+mkSimpleGrid :: SimpleGridConfig a -> SimpleGrid a
+mkSimpleGrid cfg@(SimpleGridConfig{..})= sg
+  where
+   sg = SimpleGrid
+    { gridConfig = cfg
+    , currentPageIndex = ko_observable 0
+    , itemsOnCurrentPage = ko_computed $ do
+        cpi <- ko_get $ currentPageIndex sg
+        let startIndex = pageSize * cpi
+        ko_unwrapObservableArray gridData >>= sliceV startIndex (startIndex + pageSize)
+    , maxPageIndex = ko_computed $ do
+        len <- ko_unwrapObservableArray gridData >>= lengthV
+        return len
+        -- let res = 1 + div len pageSize
+        -- return res
+    }
