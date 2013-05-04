@@ -2,8 +2,10 @@
 {-# LANGUAGE EmptyDataDecls #-}
 
 module Knockout
-  ( observableList
+  ( KnockoutModel
   , ObservableArray
+  , pushArr
+  , observableList
   , applyBindings
   ) where
 
@@ -17,12 +19,15 @@ import Fay.Text
 class KnockoutModel m
 data ObservableArray a
 
+pushArr :: ObservableArray a -> Automatic a -> Fay ()
+pushArr = ffi "%1.push(%2)"
+
 data Vector a = Vector
 
 emptyV :: Fay (Vector a)
 emptyV = ffi "[]"
 
-pushV :: Vector a -> a -> Fay (Vector a)
+pushV :: Vector a -> Automatic a -> Fay (Vector a)
 pushV = ffi "%1.push(%2)"
 
 listToVector :: [a] -> Fay (Vector a)
@@ -35,10 +40,10 @@ listToVector xs = do
 observableList :: [a] -> Fay (ObservableArray a)
 observableList xs = listToVector xs >>= observableVector
 
-observableVector :: Automatic (Vector a) -> Fay (ObservableArray a)
+observableVector :: (Vector a) -> Fay (ObservableArray a)
 observableVector = ffi "ko.observableArray(%1)"
 
 
-applyBindings :: KnockoutModel m => m -> Fay ()
-applyBindings m = ffi "ko.applyBindings(%1)"
+applyBindings :: KnockoutModel m => Automatic m -> Fay ()
+applyBindings = ffi "ko.applyBindings(%1)"
 

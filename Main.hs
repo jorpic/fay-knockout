@@ -1,4 +1,5 @@
 
+{-# LANGUAGE DeriveDataTypeable #-}
 
 module Main (main) where
 
@@ -6,7 +7,6 @@ import           Prelude
 import           FFI
 import           Fay.Text
 import           Knockout
-
 
 data GridEntry = GridEntry
   { name  :: Text
@@ -21,26 +21,23 @@ data PagedGridModel = PagedGridModel
   , addItem    :: Fay ()
   , sortByName :: Fay ()
   , jumpToFP   :: Fay ()
-  , gridVM     :: SimpleGridViewModel
   }
 
+instance KnockoutModel PagedGridModel
 
--- TODO: we need deep seq
+
 main :: Fay ()
 main = do
   someItems <- observableList
     [ GridEntry (pack "foo") 23 45.2
     , GridEntry (pack "bar") 391 312.4
     ]
-  print someItems
-{-
-  let pagedGridModel = PagedGridModel
-        { items      = someItems
-        , addItem    = error "not implemented"
-        , sortByName = error "not implemented"
-        , jumpToFP   = error "not implemented"
-        , gridVM     = error "not implemented"
-        }
-  print pagedGridModel
--}
 
+  let pgm = PagedGridModel
+        { items      = someItems
+        , addItem
+          = pushArr (items pgm) $ GridEntry (pack "new") 0 0
+        , sortByName = print (pack "not implemented")
+        , jumpToFP   = print (pack "not implemented")
+        }
+  applyBindings pgm
