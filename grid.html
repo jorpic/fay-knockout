@@ -37,7 +37,7 @@
     <div class="ko-grid-pageLinks">
       Pages: <span data-bind="text: maxPageIndex"></span>
       <br/> <br/>
-      <!-- ko foreach: ko.utils.range(0, maxPageIndex) -->
+      <!-- ko foreach: ko.utils.range(0, maxPageIndex().force()) -->
         <a href="#"
            data-bind="text: $data + 1, click: function() { $root.currentPageIndex($data) }, css: { selected: $data == $root.currentPageIndex() }">
         </a>
